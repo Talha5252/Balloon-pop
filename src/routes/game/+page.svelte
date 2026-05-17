@@ -5,7 +5,7 @@
   import { supabase } from '$lib/supabase';
 
   // Game state type definitions
-  type GameState = 'countdown' | 'playing' | 'wave_transition' | 'gameover';
+  type GameState = 'countdown' | 'playing' | 'wave_transition' | 'gameover' | 'paused';
   
   interface Balloon {
     id: number;
@@ -257,6 +257,39 @@
     if (spawnIntervalId) clearInterval(spawnIntervalId);
     if (countdownIntervalId) clearInterval(countdownIntervalId);
     stopBackgroundMusic();
+  };
+
+  const pauseGame = () => {
+    if (gameState !== 'playing') return;
+    gameState = 'paused';
+    
+    // Clear spawn loop to stop adding new balloons
+    if (spawnIntervalId) {
+      clearInterval(spawnIntervalId);
+      spawnIntervalId = null;
+    }
+    
+    // Stop ambient background music
+    stopBackgroundMusic();
+  };
+
+  const resumeGame = () => {
+    if (gameState !== 'paused') return;
+    gameState = 'playing';
+    
+    // Resume spawning balloons
+    const spawnDelay = Math.max(350, 1600 - wave * 130);
+    spawnIntervalId = setInterval(() => {
+      if (spawnedInWave < totalInWave) {
+        spawnBalloon();
+      } else {
+        clearInterval(spawnIntervalId);
+        spawnIntervalId = null;
+      }
+    }, spawnDelay);
+    
+    // Resume music
+    startBackgroundMusic();
   };
 
   const startCountdown = () => {
@@ -670,13 +703,50 @@
   <!-- HUD: Heads-up Display -->
   <header class="w-full flex items-center justify-between p-4 md:p-6 z-30 bg-gradient-to-b from-slate-950 via-slate-950/80 to-transparent backdrop-blur-[2px]">
     
-    <!-- Player & Wave details -->
-    <div class="flex items-center gap-3">
+    <!-- Player, Wave, Menu, Pause details -->
+    <div class="flex items-center gap-2.5">
+      <!-- Quit / Main Menu Button -->
+      <button 
+        onclick={quitGame}
+        class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-red-500/30 hover:bg-red-500/5 transition-all text-slate-400 hover:text-red-400 cursor-pointer shadow-md flex items-center justify-center gap-1.5 z-50"
+        title="Zurück zum Hauptmenü"
+        aria-label="Back to Main Menu"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+        </svg>
+        <span class="hidden lg:inline text-xs font-extrabold tracking-wider">MENÜ</span>
+      </button>
+
+      <!-- Pause / Resume Button -->
+      {#if gameState === 'playing' || gameState === 'paused'}
+        <button 
+          onclick={gameState === 'paused' ? resumeGame : pauseGame}
+          class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-violet-500/30 hover:bg-violet-500/5 transition-all text-slate-400 hover:text-violet-400 cursor-pointer shadow-md flex items-center justify-center gap-1.5 z-50"
+          title={gameState === 'paused' ? 'Spiel fortsetzen' : 'Spiel pausieren'}
+          aria-label="Pause game"
+        >
+          {#if gameState === 'paused'}
+            <!-- Play icon -->
+            <svg class="w-4 h-4 text-green-400 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            <span class="text-xs font-extrabold tracking-wider text-green-400">PLAY</span>
+          {:else}
+            <!-- Pause icon -->
+            <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+            </svg>
+            <span class="text-xs font-extrabold tracking-wider text-amber-400">PAUSE</span>
+          {/if}
+        </button>
+      {/if}
+
       <div class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 shadow-lg flex items-center gap-2">
         <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
         </svg>
-        <span class="text-xs font-bold text-slate-300 truncate max-w-[80px] md:max-w-[120px]">{username}</span>
+        <span class="text-xs font-bold text-slate-300 truncate max-w-[60px] sm:max-w-[80px] md:max-w-[120px]">{username}</span>
       </div>
 
       <div class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 border border-violet-400/20 shadow-lg text-xs font-extrabold tracking-wider uppercase">
@@ -743,7 +813,7 @@
         type="button"
         onclick={(e) => handlePop(balloon, e)}
         onanimationend={() => handleEscape(balloon.id)}
-        class="absolute balloon-btn cursor-pointer {balloon.popped ? 'popped' : ''} {balloon.type}"
+        class="absolute balloon-btn cursor-pointer {balloon.popped ? 'popped' : ''} {gameState === 'paused' ? 'paused' : ''} {balloon.type}"
         style="
           left: {balloon.x}%; 
           --size: {balloon.size}px; 
@@ -785,7 +855,7 @@
     <!-- POP Confetti Particles -->
     {#each particles as pt (pt.id)}
       <div 
-        class="absolute pop-particle pointer-events-none"
+        class="absolute pop-particle pointer-events-none {gameState === 'paused' ? 'paused' : ''}"
         style="
           left: {pt.x}px; 
           top: {pt.y}px;
@@ -831,6 +901,53 @@
           <div class="mt-4 px-4 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-bold text-slate-400">
             Speed is increasing!
           </div>
+        </div>
+      </div>
+    {/if}
+
+    <!-- BEAUTIFUL GLOWING RETRO PAUSE OVERLAY -->
+    {#if gameState === 'paused'}
+      <div class="absolute inset-0 flex justify-center items-center p-4 bg-slate-950/80 backdrop-blur-md z-40">
+        <div class="w-full max-w-sm bg-slate-900/90 border border-slate-800/80 rounded-3xl p-6 shadow-2xl flex flex-col gap-5 items-center text-center relative overflow-hidden animate-fade-in">
+          
+          <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-amber-500 to-violet-500"></div>
+
+          <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-1 shadow-inner animate-pulse">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+            </svg>
+          </div>
+
+          <div>
+            <h2 class="text-3xl font-black uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-violet-400 font-extrabold">
+              PAUSE
+            </h2>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Nimm einen Schluck Wasser!</p>
+          </div>
+
+          <button 
+            onclick={resumeGame}
+            class="w-full relative group cursor-pointer mt-2"
+          >
+            <div class="absolute -inset-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+            <div class="relative w-full py-3.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-extrabold text-sm rounded-xl transition duration-300 shadow-md tracking-wider flex items-center justify-center gap-1.5 border border-green-400/20">
+              <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <span>WEITERSPIELEN</span>
+            </div>
+          </button>
+
+          <button 
+            onclick={quitGame}
+            class="w-full py-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white font-extrabold text-xs rounded-xl transition duration-300 cursor-pointer shadow-md tracking-wider flex items-center justify-center gap-1.5"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+            </svg>
+            <span>HAUPTMENÜ</span>
+          </button>
+
         </div>
       </div>
     {/if}
@@ -1097,7 +1214,8 @@
   }
 
   /* Pop animation state */
-  .balloon-btn.popped {
+  .balloon-btn.popped,
+  .balloon-btn.paused {
     animation-play-state: paused !important;
     pointer-events: none;
   }
@@ -1121,6 +1239,10 @@
     background-color: var(--bg-color);
     box-shadow: 0 0 6px var(--bg-color);
     animation: explode 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  }
+
+  .pop-particle.paused {
+    animation-play-state: paused !important;
   }
 
   /* KEYFRAMES ANIMATIONS */
