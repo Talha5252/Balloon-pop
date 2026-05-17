@@ -112,27 +112,27 @@
   };
 </script>
 
-<!-- Ambient drift background balloons -->
-<div class="background-balloons" aria-hidden="true">
-  <div class="bg-balloon red" style="--left: 5%; --size: 90px; --speed: 18s; --delay: 0s;"></div>
-  <div class="bg-balloon blue" style="--left: 20%; --size: 70px; --speed: 22s; --delay: -5s;"></div>
-  <div class="bg-balloon yellow" style="--left: 38%; --size: 110px; --speed: 26s; --delay: -2s;"></div>
-  <div class="bg-balloon green" style="--left: 55%; --size: 80px; --speed: 20s; --delay: -8s;"></div>
-  <div class="bg-balloon purple" style="--left: 72%; --size: 100px; --speed: 24s; --delay: -4s;"></div>
-  <div class="bg-balloon red" style="--left: 88%; --size: 75px; --speed: 25s; --delay: -12s;"></div>
-  <div class="bg-balloon blue" style="--left: 12%; --size: 85px; --speed: 19s; --delay: -15s;"></div>
-  <div class="bg-balloon yellow" style="--left: 30%; --size: 65px; --speed: 21s; --delay: -7s;"></div>
-  <div class="bg-balloon green" style="--left: 48%; --size: 95px; --speed: 23s; --delay: -17s;"></div>
-  <div class="bg-balloon purple" style="--left: 64%; --size: 75px; --speed: 27s; --delay: -9s;"></div>
-  <div class="bg-balloon red" style="--left: 80%; --size: 105px; --speed: 20s; --delay: -14s;"></div>
-  <div class="bg-balloon blue" style="--left: 92%; --size: 80px; --speed: 24s; --delay: -20s;"></div>
-  <div class="bg-balloon yellow" style="--left: 18%; --size: 100px; --speed: 28s; --delay: -11s;"></div>
-  <div class="bg-balloon green" style="--left: 40%; --size: 70px; --speed: 19s; --delay: -13s;"></div>
-  <div class="bg-balloon purple" style="--left: 60%; --size: 90px; --speed: 22s; --delay: -6s;"></div>
-  <div class="bg-balloon red" style="--left: 82%; --size: 85px; --speed: 25s; --delay: -3s;"></div>
-</div>
-
 <main class="min-h-screen flex flex-col justify-center items-center p-4 relative overflow-hidden bg-slate-950 font-sans text-slate-100 select-none">
+  
+  <!-- Ambient drift background balloons -->
+  <div class="background-balloons" aria-hidden="true">
+    <div class="bg-balloon red" style="--left: 5%; --size: 90px; --speed: 18s; --delay: 0s;"></div>
+    <div class="bg-balloon blue" style="--left: 20%; --size: 70px; --speed: 22s; --delay: -5s;"></div>
+    <div class="bg-balloon yellow" style="--left: 38%; --size: 110px; --speed: 26s; --delay: -2s;"></div>
+    <div class="bg-balloon green" style="--left: 55%; --size: 80px; --speed: 20s; --delay: -8s;"></div>
+    <div class="bg-balloon purple" style="--left: 72%; --size: 100px; --speed: 24s; --delay: -4s;"></div>
+    <div class="bg-balloon red" style="--left: 88%; --size: 75px; --speed: 25s; --delay: -12s;"></div>
+    <div class="bg-balloon blue" style="--left: 12%; --size: 85px; --speed: 19s; --delay: -15s;"></div>
+    <div class="bg-balloon yellow" style="--left: 30%; --size: 65px; --speed: 21s; --delay: -7s;"></div>
+    <div class="bg-balloon green" style="--left: 48%; --size: 95px; --speed: 23s; --delay: -17s;"></div>
+    <div class="bg-balloon purple" style="--left: 64%; --size: 75px; --speed: 27s; --delay: -9s;"></div>
+    <div class="bg-balloon red" style="--left: 80%; --size: 105px; --speed: 20s; --delay: -14s;"></div>
+    <div class="bg-balloon blue" style="--left: 92%; --size: 80px; --speed: 24s; --delay: -20s;"></div>
+    <div class="bg-balloon yellow" style="--left: 18%; --size: 100px; --speed: 28s; --delay: -11s;"></div>
+    <div class="bg-balloon green" style="--left: 40%; --size: 70px; --speed: 19s; --delay: -13s;"></div>
+    <div class="bg-balloon purple" style="--left: 60%; --size: 90px; --speed: 22s; --delay: -6s;"></div>
+    <div class="bg-balloon red" style="--left: 82%; --size: 85px; --speed: 25s; --delay: -3s;"></div>
+  </div>
   
   <!-- Sound control -->
   <button 
