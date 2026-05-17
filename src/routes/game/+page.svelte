@@ -720,6 +720,15 @@
     isMuted = !isMuted;
     localStorage.setItem('balloonAudioEnabled', String(!isMuted));
     playSound('beep');
+    
+    // Eigene Musik stummschalten/fortsetzen
+    if (bgMusic) {
+      if (isMuted) {
+        bgMusic.pause();
+      } else if (gameState === 'playing') {
+        bgMusic.play().catch(e => console.warn(e));
+      }
+    }
   };
 </script>
 
