@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { supabase } from '$lib/supabase';
 
   // Svelte 5 Runes for reactive state
@@ -10,7 +10,22 @@
   let audioEnabled = $state(true);
   let inputFocused = $state(false);
 
-  // Load scores and username on mount
+  // Background music reference
+  let bgMusic = $state<HTMLAudioElement | null>(null);
+
+  // Reactively synchronize menu music mute state
+  $effect(() => {
+    if (bgMusic) {
+      bgMusic.muted = !audioEnabled;
+      
+      // If unmuted and paused, start playing!
+      if (audioEnabled && bgMusic.paused) {
+        bgMusic.play().catch(e => console.warn('Menu music play failed:', e));
+      }
+    }
+  });
+
+  // Load scores, username and start music on mount
   onMount(() => {
     // Generate or load permanent unique player ID
     let playerId = localStorage.getItem('balloonPlayerId');
@@ -32,6 +47,24 @@
     }
 
     loadScores();
+    startMenuMusic();
+
+    // Unlock audio context / playback on first user click/interaction (essential for browsers)
+    const unlockAudio = () => {
+      if (bgMusic && bgMusic.paused && audioEnabled) {
+        bgMusic.play().catch(e => console.warn('Audio unlock failed:', e));
+      }
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+    };
+
+    window.addEventListener('click', unlockAudio);
+    window.addEventListener('keydown', unlockAudio);
+
+    return () => {
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+    };
   });
 
   const loadScores = async () => {
@@ -97,19 +130,53 @@
   const toggleAudio = () => {
     audioEnabled = !audioEnabled;
     localStorage.setItem('balloonAudioEnabled', String(audioEnabled));
+    
+    if (bgMusic) {
+      bgMusic.muted = !audioEnabled;
+      if (audioEnabled && bgMusic.paused) {
+        bgMusic.play().catch(e => console.warn('Menu music play failed:', e));
+      }
+    }
+    
     playClickSound();
+  };
+
+  const startMenuMusic = () => {
+    if (bgMusic) return;
+    try {
+      bgMusic = new Audio(`${base}/hauptmenuemusik.mp3?v=${Date.now()}`);
+      bgMusic.loop = true;
+      bgMusic.volume = 0.20; // 20% volume for pleasant menu vibes
+      bgMusic.muted = !audioEnabled;
+      
+      // Try playing immediately
+      bgMusic.play().catch(e => console.warn('Menu music autoplay blocked:', e));
+    } catch (e) {
+      console.warn('Error loading menu music:', e);
+    }
+  };
+
+  const stopMenuMusic = () => {
+    if (bgMusic) {
+      bgMusic.pause();
+    }
   };
 
   const startGame = () => {
     const trimmed = username.trim();
     if (trimmed) {
       playClickSound();
+      stopMenuMusic(); // Stop music immediately on page transition
       localStorage.setItem('balloonUsername', trimmed);
       sessionStorage.setItem('balloonUsername', trimmed);
       // Navigate to game page
       goto(`${base}/game`);
     }
   };
+
+  onDestroy(() => {
+    stopMenuMusic();
+  });
 </script>
 
 <main class="min-h-screen flex flex-col justify-center items-center p-4 relative overflow-hidden bg-slate-950 font-sans text-slate-100 select-none">
