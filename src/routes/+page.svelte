@@ -12,6 +12,13 @@
 
   // Load scores and username on mount
   onMount(() => {
+    // Generate or load permanent unique player ID
+    let playerId = localStorage.getItem('balloonPlayerId');
+    if (!playerId) {
+      playerId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('balloonPlayerId', playerId);
+    }
+
     // Load username
     const storedUsername = localStorage.getItem('balloonUsername');
     if (storedUsername) {

@@ -457,18 +457,71 @@
       scoresList = scoresList.slice(0, 10);
       localStorage.setItem('balloonHighscores', JSON.stringify(scoresList));
 
-      // 2. Insert record into Supabase public.highscores table
+      // 2. Insert or update record in Supabase public.highscores table
       if (score > 0) {
-        const { error: insertError } = await supabase
-          .from('highscores')
-          .insert({
-            username: username,
-            score: score,
-            wave: wave
-          });
+        // Retrieve persistent unique player_id from localStorage
+        let playerId = localStorage.getItem('balloonPlayerId');
+        if (!playerId) {
+          playerId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+          localStorage.setItem('balloonPlayerId', playerId);
+        }
 
-        if (insertError) {
-          console.error('Supabase error inserting score:', insertError.message);
+        // Check if an entry already exists for this player_id
+        const { data: existingEntry, error: fetchEntryError } = await supabase
+          .from('highscores')
+          .select('id, username, score, wave')
+          .eq('player_id', playerId)
+          .maybeSingle();
+
+        if (fetchEntryError) {
+          console.error('Supabase error fetching existing score for player:', fetchEntryError.message);
+        }
+
+        if (existingEntry) {
+          // Record exists for this player!
+          const newScoreIsHigher = score > existingEntry.score;
+          
+          if (newScoreIsHigher) {
+            // Update everything: username, score, wave
+            const { error: updateError } = await supabase
+              .from('highscores')
+              .update({
+                username: username,
+                score: score,
+                wave: wave
+              })
+              .eq('player_id', playerId);
+
+            if (updateError) {
+              console.error('Supabase error updating highscore:', updateError.message);
+            }
+          } else if (username !== existingEntry.username) {
+            // Name changed, but score is not higher. Just update the username!
+            const { error: updateError } = await supabase
+              .from('highscores')
+              .update({
+                username: username
+              })
+              .eq('player_id', playerId);
+
+            if (updateError) {
+              console.error('Supabase error updating username:', updateError.message);
+            }
+          }
+        } else {
+          // No record exists for this player yet. Insert a new one!
+          const { error: insertError } = await supabase
+            .from('highscores')
+            .insert({
+              player_id: playerId,
+              username: username,
+              score: score,
+              wave: wave
+            });
+
+          if (insertError) {
+            console.error('Supabase error inserting new player score:', insertError.message);
+          }
         }
       }
 
