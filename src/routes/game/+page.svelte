@@ -518,6 +518,7 @@
     clearTimers();
     gameState = 'wave_transition';
     playSound('wave_clear');
+    lives = 3;
 
     setTimeout(() => {
       wave++;
@@ -534,10 +535,10 @@
   };
 
   const saveHighScore = async () => {
+    let scoresList: Array<{ name: string; score: number; wave: number; date: string }> = [];
     try {
       // 1. First save score locally in localStorage
       const stored = localStorage.getItem('balloonHighscores');
-      let scoresList: Array<{ name: string; score: number; wave: number; date: string }> = [];
 
       if (stored) {
         const parsed = JSON.parse(stored);
