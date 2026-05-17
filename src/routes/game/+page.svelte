@@ -197,103 +197,35 @@
     }
   };
 
-  // Procedural Synth-Wave Background Music Scheduler (sample-accurate, zero latency, no assets to load)
-  let musicIntervalId: any = null;
-  let musicStep = 0;
-  let nextNoteTime = 0;
+    // Hintergrundmusik-Referenz
+  let bgMusic: HTMLAudioElement | null = null;
 
   const startBackgroundMusic = () => {
-    if (musicIntervalId) return;
+    // Wenn die Musik bereits geladen ist, einfach abspielen
+    if (bgMusic) {
+      if (!isMuted && gameState === 'playing') {
+        bgMusic.play().catch(e => console.warn('Audio autoplay blocked:', e));
+      }
+      return;
+    }
     
     try {
-      const ctx = getAudioContext();
-      nextNoteTime = ctx.currentTime;
-      musicStep = 0;
+      // Lädt die Datei aus dem /static/ Ordner, kompatibel mit GitHub Pages!
+      bgMusic = new Audio(`${base}/music.mp3`);
+      bgMusic.loop = true; // Musik wiederholt sich endlos
+      bgMusic.volume = 0.25; // Lautstärke auf 25% (angenehm im Hintergrund)
 
-      // 8-step bassline looping in A minor
-      const bassPattern = [110, 110, 130.81, 110, 146.83, 110, 130.81, 164.81]; // A2, A2, C3, A2, D3, A2, C3, E3
-      
-      // Soft pentatonic melody pattern (sparse to be ambient and rewarding)
-      const melodyPattern = [
-        440, 0, 523.25, 0, 
-        587.33, 0, 659.25, 783.99, 
-        880, 0, 783.99, 0, 
-        659.25, 587.33, 523.25, 392.00
-      ];
-
-      const stepDuration = 0.22; // 220ms per step (~136 BPM)
-
-      // Lookahead loop for jitter-free audio scheduling
-      musicIntervalId = setInterval(() => {
-        if (isMuted || gameState !== 'playing') return;
-        
-        const now = ctx.currentTime;
-        // Schedule notes up to 150ms in the future
-        while (nextNoteTime < now + 0.15) {
-          const time = nextNoteTime;
-          
-          // 1. Play deep triangle synth bass
-          const bassFreq = bassPattern[musicStep % bassPattern.length];
-          if (bassFreq > 0) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(bassFreq, time);
-            
-            // Ultra-low background volume (4%) to blend nicely
-            gain.gain.setValueAtTime(0.04, time);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration - 0.02);
-            
-            osc.start(time);
-            osc.stop(time + stepDuration - 0.02);
-          }
-
-          // 2. Play warm lead melody with pitch vibrato
-          const melodyFreq = melodyPattern[musicStep % melodyPattern.length];
-          if (melodyFreq > 0 && musicStep % 2 === 0) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(melodyFreq, time);
-            
-            // LFO Pitch Modulator for classic vaporwave vibrato feel
-            const lfo = ctx.createOscillator();
-            const lfoGain = ctx.createGain();
-            lfo.frequency.value = 5.5; // Vibrato speed
-            lfoGain.gain.value = 4.5;   // Vibrato depth
-            lfo.connect(lfoGain);
-            lfoGain.connect(osc.frequency);
-            
-            // Soft melody volume (1.5%)
-            gain.gain.setValueAtTime(0.015, time);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration * 1.4);
-            
-            lfo.start(time);
-            osc.start(time);
-            
-            lfo.stop(time + stepDuration * 1.4);
-            osc.stop(time + stepDuration * 1.4);
-          }
-
-          nextNoteTime += stepDuration;
-          musicStep++;
-        }
-      }, 35);
+      if (!isMuted && gameState === 'playing') {
+        bgMusic.play().catch(e => console.warn('Audio autoplay blocked:', e));
+      }
     } catch (e) {
-      console.warn('Failed to start background music:', e);
+      console.warn('Fehler beim Laden der Musikdatei:', e);
     }
   };
 
   const stopBackgroundMusic = () => {
-    if (musicIntervalId) {
-      clearInterval(musicIntervalId);
-      musicIntervalId = null;
+    if (bgMusic) {
+      bgMusic.pause();
     }
   };
 
