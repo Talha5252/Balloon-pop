@@ -210,8 +210,8 @@
     }
     
     try {
-      // Lädt die Datei aus dem /static/ Ordner, kompatibel mit GitHub Pages!
-      bgMusic = new Audio(`${base}/music.mp3`);
+      // Lädt die Datei aus dem /static/ Ordner, kompatibel mit GitHub Pages mit Cache-Buster!
+      bgMusic = new Audio(`${base}/music.mp3?v=${Date.now()}`);
       bgMusic.loop = true; // Musik wiederholt sich endlos
       bgMusic.volume = 0.25; // Lautstärke auf 25% (angenehm im Hintergrund)
 
