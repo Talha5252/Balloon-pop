@@ -703,7 +703,7 @@
   <!-- HUD: Heads-up Display -->
   <header class="w-full flex items-center justify-between p-4 md:p-6 z-30 bg-gradient-to-b from-slate-950 via-slate-950/80 to-transparent backdrop-blur-[2px]">
     
-    <!-- Player, Wave, Menu, Pause details -->
+    <!-- Player, Wave, Menu details -->
     <div class="flex items-center gap-2.5">
       <!-- Quit / Main Menu Button -->
       <button 
@@ -718,6 +718,29 @@
         <span class="hidden lg:inline text-xs font-extrabold tracking-wider">MENÜ</span>
       </button>
 
+      <div class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 shadow-lg flex items-center gap-2">
+        <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+        </svg>
+        <span class="text-xs font-bold text-slate-300 truncate max-w-[60px] sm:max-w-[80px] md:max-w-[120px]">{username}</span>
+      </div>
+
+      <div class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 border border-violet-400/20 shadow-lg text-xs font-extrabold tracking-wider uppercase">
+        WAVE {wave}
+      </div>
+    </div>
+
+    <!-- Glowing Score Board -->
+    <div class="flex flex-col items-center">
+      <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">SCORE</span>
+      <span class="text-3xl md:text-4xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-pink-400 to-amber-300 font-extrabold drop-shadow-[0_0_10px_rgba(236,72,153,0.3)]">
+        {score.toLocaleString()}
+      </span>
+    </div>
+
+    <!-- Health / Sound / Pause settings -->
+    <div class="flex items-center gap-2.5 sm:gap-4">
+      
       <!-- Pause / Resume Button -->
       {#if gameState === 'playing' || gameState === 'paused'}
         <button 
@@ -742,29 +765,6 @@
         </button>
       {/if}
 
-      <div class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 shadow-lg flex items-center gap-2">
-        <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-        </svg>
-        <span class="text-xs font-bold text-slate-300 truncate max-w-[60px] sm:max-w-[80px] md:max-w-[120px]">{username}</span>
-      </div>
-
-      <div class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 border border-violet-400/20 shadow-lg text-xs font-extrabold tracking-wider uppercase">
-        WAVE {wave}
-      </div>
-    </div>
-
-    <!-- Glowing Score Board -->
-    <div class="flex flex-col items-center">
-      <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">SCORE</span>
-      <span class="text-3xl md:text-4xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-pink-400 to-amber-300 font-extrabold drop-shadow-[0_0_10px_rgba(236,72,153,0.3)]">
-        {score.toLocaleString()}
-      </span>
-    </div>
-
-    <!-- Health / Sound settings -->
-    <div class="flex items-center gap-4">
-      
       <!-- Audio Toggle Button -->
       <button 
         onclick={toggleSound}
@@ -1021,7 +1021,7 @@
                       </span>
                     </div>
                     <div class="flex items-center gap-3">
-                      <span class="text-[10px] font-semibold text-slate-600">Wave {entry.wave}</span>
+                      <span class="text-[10px] font-semibold text-slate-600">Wave {entry.wave || 1}</span>
                       <span class="font-black text-right min-w-[50px] tracking-wide text-slate-200">
                         {entry.score.toLocaleString()}
                       </span>

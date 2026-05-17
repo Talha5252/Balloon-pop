@@ -244,7 +244,7 @@
               
               <div class="flex items-center gap-4">
                 <div class="text-right">
-                  <span class="text-xs text-slate-500 block font-semibold">Wave {entry.wave}</span>
+                  <span class="text-xs text-slate-500 block font-semibold">Wave {entry.wave || 1}</span>
                 </div>
                 <div class="font-black text-right text-base tracking-wide {idx === 0 ? 'text-amber-400' : idx === 1 ? 'text-slate-200' : 'text-violet-400'}">
                   {entry.score.toLocaleString()}
