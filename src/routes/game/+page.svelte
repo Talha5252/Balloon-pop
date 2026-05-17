@@ -1107,7 +1107,7 @@
   </div>
 
   <!-- Instruction bar -->
-  <footer class="w-full py-4 px-4 border-t border-slate-900/60 bg-slate-950/90 backdrop-blur-md z-20 flex flex-wrap justify-center items-center gap-3 md:gap-6 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+  <footer class="w-full py-4 px-4 bg-transparent z-20 flex flex-wrap justify-center items-center gap-3 md:gap-6">
     <!-- Red Balloon Badge -->
     <div class="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-slate-900/40 border border-slate-800/80 shadow-md hover:border-red-500/30 hover:bg-red-500/5 transition-all duration-300 group cursor-default">
       <div class="relative w-3.5 h-4.5 group-hover:scale-115 transition-transform flex flex-col items-center">
