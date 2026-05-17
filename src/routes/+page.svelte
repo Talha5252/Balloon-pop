@@ -114,13 +114,22 @@
 
 <!-- Ambient drift background balloons -->
 <div class="background-balloons" aria-hidden="true">
-  <div class="bg-balloon red" style="--left: 8%; --size: 90px; --speed: 18s; --delay: 0s;"></div>
-  <div class="bg-balloon blue" style="--left: 25%; --size: 70px; --speed: 22s; --delay: -5s;"></div>
-  <div class="bg-balloon yellow" style="--left: 45%; --size: 110px; --speed: 26s; --delay: -2s;"></div>
-  <div class="bg-balloon green" style="--left: 65%; --size: 80px; --speed: 20s; --delay: -8s;"></div>
-  <div class="bg-balloon purple" style="--left: 85%; --size: 100px; --speed: 24s; --delay: -4s;"></div>
-  <div class="bg-balloon red" style="--left: 15%; --size: 75px; --speed: 25s; --delay: -12s;"></div>
-  <div class="bg-balloon blue" style="--left: 75%; --size: 85px; --speed: 19s; --delay: -15s;"></div>
+  <div class="bg-balloon red" style="--left: 5%; --size: 90px; --speed: 18s; --delay: 0s;"></div>
+  <div class="bg-balloon blue" style="--left: 20%; --size: 70px; --speed: 22s; --delay: -5s;"></div>
+  <div class="bg-balloon yellow" style="--left: 38%; --size: 110px; --speed: 26s; --delay: -2s;"></div>
+  <div class="bg-balloon green" style="--left: 55%; --size: 80px; --speed: 20s; --delay: -8s;"></div>
+  <div class="bg-balloon purple" style="--left: 72%; --size: 100px; --speed: 24s; --delay: -4s;"></div>
+  <div class="bg-balloon red" style="--left: 88%; --size: 75px; --speed: 25s; --delay: -12s;"></div>
+  <div class="bg-balloon blue" style="--left: 12%; --size: 85px; --speed: 19s; --delay: -15s;"></div>
+  <div class="bg-balloon yellow" style="--left: 30%; --size: 65px; --speed: 21s; --delay: -7s;"></div>
+  <div class="bg-balloon green" style="--left: 48%; --size: 95px; --speed: 23s; --delay: -17s;"></div>
+  <div class="bg-balloon purple" style="--left: 64%; --size: 75px; --speed: 27s; --delay: -9s;"></div>
+  <div class="bg-balloon red" style="--left: 80%; --size: 105px; --speed: 20s; --delay: -14s;"></div>
+  <div class="bg-balloon blue" style="--left: 92%; --size: 80px; --speed: 24s; --delay: -20s;"></div>
+  <div class="bg-balloon yellow" style="--left: 18%; --size: 100px; --speed: 28s; --delay: -11s;"></div>
+  <div class="bg-balloon green" style="--left: 40%; --size: 70px; --speed: 19s; --delay: -13s;"></div>
+  <div class="bg-balloon purple" style="--left: 60%; --size: 90px; --speed: 22s; --delay: -6s;"></div>
+  <div class="bg-balloon red" style="--left: 82%; --size: 85px; --speed: 25s; --delay: -3s;"></div>
 </div>
 
 <main class="min-h-screen flex flex-col justify-center items-center p-4 relative overflow-hidden bg-slate-950 font-sans text-slate-100 select-none">
@@ -283,7 +292,7 @@
     overflow: hidden;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.25;
+    opacity: 0.38;
   }
 
   .bg-balloon {
@@ -322,9 +331,10 @@
     transform: translateX(-50%);
   }
 
-  /* Balloon colors */
+  /* Balloon colors and glowing ambient neon shadows */
   .bg-balloon.red {
     background: radial-gradient(circle at 35% 35%, hsl(0, 85%, 65%), hsl(0, 85%, 35%));
+    box-shadow: inset -8px -8px 20px rgba(0,0,0,0.5), inset 8px 8px 20px rgba(255,255,255,0.25), 0 0 15px rgba(239, 68, 68, 0.18);
   }
   .bg-balloon.red::before {
     border-bottom: 6px solid hsl(0, 85%, 45%);
@@ -332,6 +342,7 @@
 
   .bg-balloon.blue {
     background: radial-gradient(circle at 35% 35%, hsl(200, 85%, 65%), hsl(200, 85%, 35%));
+    box-shadow: inset -8px -8px 20px rgba(0,0,0,0.5), inset 8px 8px 20px rgba(255,255,255,0.25), 0 0 15px rgba(6, 182, 212, 0.18);
   }
   .bg-balloon.blue::before {
     border-bottom: 6px solid hsl(200, 85%, 45%);
@@ -339,6 +350,7 @@
 
   .bg-balloon.yellow {
     background: radial-gradient(circle at 35% 35%, hsl(45, 95%, 65%), hsl(45, 95%, 35%));
+    box-shadow: inset -8px -8px 20px rgba(0,0,0,0.5), inset 8px 8px 20px rgba(255,255,255,0.25), 0 0 15px rgba(245, 158, 11, 0.18);
   }
   .bg-balloon.yellow::before {
     border-bottom: 6px solid hsl(45, 95%, 45%);
@@ -346,6 +358,7 @@
 
   .bg-balloon.green {
     background: radial-gradient(circle at 35% 35%, hsl(120, 75%, 60%), hsl(120, 75%, 30%));
+    box-shadow: inset -8px -8px 20px rgba(0,0,0,0.5), inset 8px 8px 20px rgba(255,255,255,0.25), 0 0 15px rgba(34, 197, 94, 0.18);
   }
   .bg-balloon.green::before {
     border-bottom: 6px solid hsl(120, 75%, 40%);
@@ -353,6 +366,7 @@
 
   .bg-balloon.purple {
     background: radial-gradient(circle at 35% 35%, hsl(270, 80%, 65%), hsl(270, 80%, 35%));
+    box-shadow: inset -8px -8px 20px rgba(0,0,0,0.5), inset 8px 8px 20px rgba(255,255,255,0.25), 0 0 15px rgba(168, 85, 247, 0.18);
   }
   .bg-balloon.purple::before {
     border-bottom: 6px solid hsl(270, 80%, 45%);
