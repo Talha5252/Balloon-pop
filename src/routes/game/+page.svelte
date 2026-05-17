@@ -1094,10 +1094,10 @@
     }
     50% {
       /* Add subtle wind drift */
-      transform: translateY(-55vh) rotate(5deg);
+      transform: translateY(-51vh) rotate(5deg);
     }
     100% {
-      transform: translateY(-130vh) rotate(-5deg);
+      transform: translateY(-102vh) rotate(-5deg);
     }
   }
 
