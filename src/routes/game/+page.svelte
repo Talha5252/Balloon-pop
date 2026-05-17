@@ -273,15 +273,36 @@
     stopBackgroundMusic();
   };
 
+  const getSpawnCountForTick = () => {
+    let count = 1;
+    // Calculate chance for double and triple spawns to increase pressure as wave advances
+    const doubleChance = Math.min(0.6, (wave - 1) * 0.15); // Wave 1: 0%, Wave 2: 15%, Wave 3: 30%, Wave 4: 45%, Wave 5+: 60%
+    const tripleChance = Math.min(0.25, (wave - 2) * 0.08); // Wave 1-2: 0%, Wave 3: 8%, Wave 4: 16%, Wave 5+: 24%
+    
+    const rand = Math.random();
+    if (rand < tripleChance) {
+      count = 3;
+    } else if (rand < tripleChance + doubleChance) {
+      count = 2;
+    }
+    return count;
+  };
+
   const resumeGame = () => {
     if (gameState !== 'paused') return;
     gameState = 'playing';
     
-    // Resume spawning balloons
-    const spawnDelay = Math.max(350, 1600 - wave * 130);
+    // Resume spawning balloons with increased 30% faster rate and multi-spawn ticks
+    const spawnDelay = Math.max(250, Math.floor((1600 - wave * 130) * 0.7));
     spawnIntervalId = setInterval(() => {
       if (spawnedInWave < totalInWave) {
-        spawnBalloon();
+        const maxPossible = totalInWave - spawnedInWave;
+        const desiredCount = getSpawnCountForTick();
+        const actualCount = Math.min(maxPossible, desiredCount);
+        
+        for (let i = 0; i < actualCount; i++) {
+          spawnBalloon();
+        }
       } else {
         clearInterval(spawnIntervalId);
         spawnIntervalId = null;
@@ -315,20 +336,29 @@
     balloons = [];
     spawnedInWave = 0;
     
-    // Wave configs: Wave 1 has 10 balloons. Spawns faster and more in later waves.
-    totalInWave = 8 + wave * 4;
-    const spawnDelay = Math.max(350, 1600 - wave * 130);
+    // Wave configs: Wave 1 has 15 balloons, scales up 30% harder and has larger density
+    totalInWave = Math.floor(10 + wave * 5.2);
+    const spawnDelay = Math.max(250, Math.floor((1600 - wave * 130) * 0.7));
 
     // Start background music loop
     startBackgroundMusic();
 
-    // Initial trigger
-    spawnBalloon();
+    // Initial trigger: multi-spawns at the very beginning of the wave!
+    const initialSpawn = Math.min(totalInWave - spawnedInWave, getSpawnCountForTick());
+    for (let i = 0; i < initialSpawn; i++) {
+      spawnBalloon();
+    }
 
-    // Spawn loop
+    // Spawn loop with 30% reduced delay and multi-spawns
     spawnIntervalId = setInterval(() => {
       if (spawnedInWave < totalInWave) {
-        spawnBalloon();
+        const maxPossible = totalInWave - spawnedInWave;
+        const desiredCount = getSpawnCountForTick();
+        const actualCount = Math.min(maxPossible, desiredCount);
+        
+        for (let i = 0; i < actualCount; i++) {
+          spawnBalloon();
+        }
       } else {
         clearInterval(spawnIntervalId);
         spawnIntervalId = null;
@@ -375,9 +405,9 @@
       points = 100;
     }
 
-    // Set flying velocity. Base duration decreases with wave number.
-    const baseMinSpeed = Math.max(2.2, 5.0 - wave * 0.4);
-    const baseMaxSpeed = Math.max(3.8, 8.0 - wave * 0.6);
+    // Set flying velocity. Base duration decreases with wave number, multiplied by 0.7 to rise 30% faster!
+    const baseMinSpeed = Math.max(1.5, (5.0 - wave * 0.45) * 0.7);
+    const baseMaxSpeed = Math.max(2.6, (8.0 - wave * 0.65) * 0.7);
     let speed = Math.random() * (baseMaxSpeed - baseMinSpeed) + baseMinSpeed;
 
     // Speed modifiers based on type
