@@ -181,7 +181,7 @@
           <input 
             type="text" 
             id="username"
-            placeholder="SuperPopper9000..." 
+            placeholder="BinLaden123..." 
             bind:value={username}
             onfocus={() => inputFocused = true}
             onblur={() => inputFocused = false}
