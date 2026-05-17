@@ -1107,11 +1107,52 @@
   </div>
 
   <!-- Instruction bar -->
-  <footer class="w-full text-center py-3 text-[10px] font-bold tracking-widest text-slate-600 uppercase border-t border-slate-900/50 bg-slate-950 z-20">
-    <span class="text-red-400">RED: 100 PTS</span> &bull; 
-    <span class="text-cyan-400">BLUE: 200 PTS</span> &bull; 
-    <span class="text-yellow-400">GOLD: 400 PTS</span> &bull; 
-    <span class="text-purple-400">BOMB: -300 PTS &amp; -1 LIFE</span>
+  <footer class="w-full py-4 px-4 border-t border-slate-900/60 bg-slate-950/90 backdrop-blur-md z-20 flex flex-wrap justify-center items-center gap-3 md:gap-6 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+    <!-- Red Balloon Badge -->
+    <div class="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-slate-900/40 border border-slate-800/80 shadow-md hover:border-red-500/30 hover:bg-red-500/5 transition-all duration-300 group cursor-default">
+      <div class="relative w-3.5 h-4.5 group-hover:scale-115 transition-transform flex flex-col items-center">
+        <div class="w-full h-[80%] bg-gradient-to-br from-red-400 via-red-500 to-red-700 shadow-[0_0_8px_rgba(239,68,68,0.4)]" style="border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;"></div>
+        <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[4px] border-b-red-600 -mt-[1px]"></div>
+      </div>
+      <span class="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">
+        RED &bull; <span class="text-red-400 group-hover:text-red-300 transition-colors">100 PTS</span>
+      </span>
+    </div>
+
+    <!-- Blue Balloon Badge -->
+    <div class="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-slate-900/40 border border-slate-800/80 shadow-md hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-all duration-300 group cursor-default">
+      <div class="relative w-3.5 h-4.5 group-hover:scale-115 transition-transform flex flex-col items-center">
+        <div class="w-full h-[80%] bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-700 shadow-[0_0_8px_rgba(6,182,212,0.4)]" style="border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;"></div>
+        <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[4px] border-b-cyan-600 -mt-[1px]"></div>
+      </div>
+      <span class="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">
+        BLUE &bull; <span class="text-cyan-400 group-hover:text-cyan-300 transition-colors">200 PTS</span>
+      </span>
+    </div>
+
+    <!-- Gold Balloon Badge -->
+    <div class="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-slate-900/40 border border-slate-800/80 shadow-md hover:border-amber-500/30 hover:bg-amber-500/5 transition-all duration-300 group cursor-default">
+      <div class="relative w-3.5 h-4.5 group-hover:scale-115 transition-transform flex flex-col items-center animate-pulse">
+        <div class="w-full h-[80%] bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 shadow-[0_0_12px_rgba(245,158,11,0.5)]" style="border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;"></div>
+        <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[4px] border-b-amber-600 -mt-[1px]"></div>
+      </div>
+      <span class="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">
+        GOLD &bull; <span class="text-amber-400 group-hover:text-amber-300 transition-colors">400 PTS</span>
+      </span>
+    </div>
+
+    <!-- Bomb Badge -->
+    <div class="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-slate-900/40 border border-slate-800/80 shadow-md hover:border-purple-500/30 hover:bg-purple-500/5 transition-all duration-300 group cursor-default">
+      <div class="relative w-3.5 h-4.5 group-hover:scale-115 transition-transform flex flex-col items-center">
+        <div class="w-full h-[80%] bg-gradient-to-br from-purple-400 via-purple-600 to-purple-900 shadow-[0_0_8px_rgba(168,85,247,0.4)] relative" style="border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;">
+          <div class="absolute inset-0 flex items-center justify-center text-[7px] font-black text-red-500/90 leading-none select-none">!</div>
+        </div>
+        <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[4px] border-b-purple-600 -mt-[1px]"></div>
+      </div>
+      <span class="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">
+        BOMB &bull; <span class="text-purple-400 group-hover:text-purple-300 transition-colors">-300 PTS &amp; -1 LIFE</span>
+      </span>
+    </div>
   </footer>
 
 </div>
