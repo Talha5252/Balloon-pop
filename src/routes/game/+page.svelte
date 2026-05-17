@@ -5,7 +5,7 @@
   import { supabase } from '$lib/supabase';
 
   // Game state type definitions
-  type GameState = 'countdown' | 'playing' | 'wave_transition' | 'gameover' | 'paused';
+  type GameState = 'countdown' | 'playing' | 'wave_transition' | 'gameover' | 'paused' | 'resume_countdown';
   
   interface Balloon {
     id: number;
@@ -301,27 +301,44 @@
 
   const resumeGame = () => {
     if (gameState !== 'paused') return;
-    gameState = 'playing';
     
-    // Resume spawning balloons with increased 30% faster rate and multi-spawn ticks
-    const spawnDelay = Math.max(250, Math.floor((1600 - wave * 130) * 0.7));
-    spawnIntervalId = setInterval(() => {
-      if (spawnedInWave < totalInWave) {
-        const maxPossible = totalInWave - spawnedInWave;
-        const desiredCount = getSpawnCountForTick();
-        const actualCount = Math.min(maxPossible, desiredCount);
-        
-        for (let i = 0; i < actualCount; i++) {
-          spawnBalloon();
-        }
+    gameState = 'resume_countdown';
+    countdownVal = 3;
+    playSound('beep');
+    
+    countdownIntervalId = setInterval(() => {
+      countdownVal--;
+      if (countdownVal > 0) {
+        playSound('beep');
+      } else if (countdownVal === 0) {
+        playSound('start');
       } else {
-        clearInterval(spawnIntervalId);
-        spawnIntervalId = null;
+        clearInterval(countdownIntervalId);
+        countdownIntervalId = null;
+        
+        gameState = 'playing';
+        
+        // Resume spawning balloons with increased 30% faster rate and multi-spawn ticks
+        const spawnDelay = Math.max(250, Math.floor((1600 - wave * 130) * 0.7));
+        spawnIntervalId = setInterval(() => {
+          if (spawnedInWave < totalInWave) {
+            const maxPossible = totalInWave - spawnedInWave;
+            const desiredCount = getSpawnCountForTick();
+            const actualCount = Math.min(maxPossible, desiredCount);
+            
+            for (let i = 0; i < actualCount; i++) {
+              spawnBalloon();
+            }
+          } else {
+            clearInterval(spawnIntervalId);
+            spawnIntervalId = null;
+          }
+        }, spawnDelay);
+        
+        // Resume music
+        startBackgroundMusic();
       }
-    }, spawnDelay);
-    
-    // Resume music
-    startBackgroundMusic();
+    }, 1000);
   };
 
   const startCountdown = () => {
@@ -855,7 +872,7 @@
         type="button"
         onclick={(e) => handlePop(balloon, e)}
         onanimationend={() => handleEscape(balloon.id)}
-        class="absolute balloon-btn cursor-pointer {balloon.popped ? 'popped' : ''} {gameState === 'paused' ? 'paused' : ''} {balloon.type}"
+        class="absolute balloon-btn cursor-pointer {balloon.popped ? 'popped' : ''} {(gameState === 'paused' || gameState === 'resume_countdown') ? 'paused' : ''} {balloon.type}"
         style="
           left: {balloon.x}%; 
           --size: {balloon.size}px; 
@@ -893,11 +910,11 @@
         <div class="balloon-string"></div>
       </button>
     {/each}
-
+ 
     <!-- POP Confetti Particles -->
     {#each particles as pt (pt.id)}
       <div 
-        class="absolute pop-particle pointer-events-none {gameState === 'paused' ? 'paused' : ''}"
+        class="absolute pop-particle pointer-events-none {(gameState === 'paused' || gameState === 'resume_countdown') ? 'paused' : ''}"
         style="
           left: {pt.x}px; 
           top: {pt.y}px;
@@ -909,15 +926,17 @@
         "
       ></div>
     {/each}
-
-    <!-- Pre-game Countdown Overlay -->
-    {#if gameState === 'countdown'}
+ 
+    <!-- Pre-game / Resume Countdown Overlay -->
+    {#if gameState === 'countdown' || gameState === 'resume_countdown'}
       <div class="absolute inset-0 flex flex-col justify-center items-center bg-slate-950/80 backdrop-blur-md z-40 transition-all duration-300">
-        <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Game starting in...</span>
+        <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">
+          {gameState === 'countdown' ? 'Game starting in...' : 'Resuming in...'}
+        </span>
         <div class="relative flex items-center justify-center">
           <div class="absolute w-48 h-48 bg-violet-600/10 rounded-full filter blur-2xl animate-pulse"></div>
           <span class="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-slate-100 to-slate-400 font-extrabold animate-countdown shadow-sm">
-            {countdownVal > 0 ? countdownVal : 'POP!'}
+            {countdownVal > 0 ? countdownVal : (gameState === 'countdown' ? 'POP!' : 'GO!')}
           </span>
         </div>
         <span class="text-xs font-bold uppercase tracking-wider text-violet-400 mt-6 animate-pulse">Ready Your Finger/Cursor!</span>
