@@ -197,13 +197,21 @@
     }
   };
 
-    // Hintergrundmusik-Referenz
+  // Hintergrundmusik-Referenz
   let bgMusic: HTMLAudioElement | null = null;
+
+  // Reactively synchronize mute state to native HTMLAudioElement
+  $effect(() => {
+    if (bgMusic) {
+      bgMusic.muted = isMuted;
+    }
+  });
 
   const startBackgroundMusic = () => {
     // Wenn die Musik bereits geladen ist, einfach abspielen
     if (bgMusic) {
-      if (!isMuted && gameState === 'playing') {
+      bgMusic.muted = isMuted;
+      if (gameState === 'playing') {
         bgMusic.play().catch(e => console.warn('Audio autoplay blocked:', e));
       }
       return;
@@ -214,8 +222,9 @@
       bgMusic = new Audio(`${base}/music.mp3?v=${Date.now()}`);
       bgMusic.loop = true; // Musik wiederholt sich endlos
       bgMusic.volume = 0.25; // Lautstärke auf 25% (angenehm im Hintergrund)
+      bgMusic.muted = isMuted;
 
-      if (!isMuted && gameState === 'playing') {
+      if (gameState === 'playing') {
         bgMusic.play().catch(e => console.warn('Audio autoplay blocked:', e));
       }
     } catch (e) {
@@ -720,15 +729,6 @@
     isMuted = !isMuted;
     localStorage.setItem('balloonAudioEnabled', String(!isMuted));
     playSound('beep');
-    
-    // Eigene Musik stummschalten/fortsetzen
-    if (bgMusic) {
-      if (isMuted) {
-        bgMusic.pause();
-      } else if (gameState === 'playing') {
-        bgMusic.play().catch(e => console.warn(e));
-      }
-    }
   };
 </script>
 
