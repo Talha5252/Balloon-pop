@@ -955,7 +955,7 @@
     outline: none;
     z-index: 10;
     transform-origin: bottom center;
-    animation: rise var(--duration) cubic-bezier(0.1, 0.45, 0.2, 0.95) forwards;
+    animation: rise var(--duration) linear forwards;
   }
 
   /* Balloon body 3D glossy bulb shape */
@@ -1094,10 +1094,10 @@
     }
     50% {
       /* Add subtle wind drift */
-      transform: translateY(-51vh) rotate(5deg);
+      transform: translateY(-48vh) rotate(5deg);
     }
     100% {
-      transform: translateY(-102vh) rotate(-5deg);
+      transform: translateY(-96vh) rotate(-5deg);
     }
   }
 
