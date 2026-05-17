@@ -200,10 +200,12 @@
   // Hintergrundmusik-Referenz
   let bgMusic: HTMLAudioElement | null = null;
 
-  // Reactively synchronize mute state to native HTMLAudioElement
+  // Reactively synchronize mute state and playback rate (speeding up 5% per wave!) to native HTMLAudioElement
   $effect(() => {
     if (bgMusic) {
       bgMusic.muted = isMuted;
+      // Normal speed on Wave 1, increases by 5% per wave, capped at 35% faster (1.35x speed)
+      bgMusic.playbackRate = Math.min(1.35, 1.0 + (wave - 1) * 0.05);
     }
   });
 
