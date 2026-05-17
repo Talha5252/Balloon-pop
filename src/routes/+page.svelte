@@ -25,6 +25,12 @@
     }
   });
 
+  const playMenuMusic = () => {
+    if (bgMusic && audioEnabled && bgMusic.paused) {
+      bgMusic.play().catch(e => console.warn('Audio play failed:', e));
+    }
+  };
+
   // Load scores, username and start music on mount
   onMount(() => {
     // Generate or load permanent unique player ID
@@ -51,19 +57,20 @@
 
     // Unlock audio context / playback on first user click/interaction (essential for browsers)
     const unlockAudio = () => {
-      if (bgMusic && bgMusic.paused && audioEnabled) {
-        bgMusic.play().catch(e => console.warn('Audio unlock failed:', e));
-      }
+      playMenuMusic();
       window.removeEventListener('click', unlockAudio);
       window.removeEventListener('keydown', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
     };
 
     window.addEventListener('click', unlockAudio);
     window.addEventListener('keydown', unlockAudio);
+    window.addEventListener('touchstart', unlockAudio);
 
     return () => {
       window.removeEventListener('click', unlockAudio);
       window.removeEventListener('keydown', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
     };
   });
 
@@ -146,7 +153,7 @@
     try {
       bgMusic = new Audio(`${base}/hauptmenuemusik.mp3?v=${Date.now()}`);
       bgMusic.loop = true;
-      bgMusic.volume = 0.20; // 20% volume for pleasant menu vibes
+      bgMusic.volume = 0.08; // 8% volume - quieter and more pleasant!
       bgMusic.muted = !audioEnabled;
       
       // Try playing immediately
@@ -259,7 +266,7 @@
             id="username"
             placeholder="BinLaden123..." 
             bind:value={username}
-            onfocus={() => inputFocused = true}
+            onfocus={() => { inputFocused = true; playMenuMusic(); }}
             onblur={() => inputFocused = false}
             onkeydown={(e) => e.key === 'Enter' && startGame()}
             maxlength="16"
