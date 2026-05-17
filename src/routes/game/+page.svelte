@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { onMount, onDestroy } from 'svelte';
   import { supabase } from '$lib/supabase';
 
@@ -203,7 +204,7 @@
       username = storedUsername;
     } else {
       // If direct access, redirect back to login
-      goto('/');
+      goto(`${base}/`);
       return;
     }
 
@@ -560,7 +561,7 @@
 
   const quitGame = () => {
     clearTimers();
-    goto('/');
+    goto(`${base}/`);
   };
 
   const toggleSound = () => {

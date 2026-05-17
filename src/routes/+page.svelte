@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { onMount } from 'svelte';
   import { supabase } from '$lib/supabase';
 
@@ -99,7 +100,7 @@
       localStorage.setItem('balloonUsername', trimmed);
       sessionStorage.setItem('balloonUsername', trimmed);
       // Navigate to game page
-      goto('/game');
+      goto(`${base}/game`);
     }
   };
 </script>
