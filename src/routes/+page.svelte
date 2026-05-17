@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
+  import { supabase } from '$lib/supabase';
 
   // Svelte 5 Runes for reactive state
   let username = $state('');
@@ -25,28 +26,39 @@
     loadScores();
   });
 
-  const loadScores = () => {
+  const loadScores = async () => {
     try {
+      // First load local scores as a fallback
       const stored = localStorage.getItem('balloonHighscores');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
           sortedScores = parsed.sort((a, b) => b.score - a.score).slice(0, 5);
-        } else if (typeof parsed === 'object') {
-          // Backward compatibility for old format: Record<string, number>
-          sortedScores = Object.entries(parsed)
-            .map(([name, score]) => ({ 
-              name, 
-              score: score as number, 
-              wave: 1, 
-              date: new Date().toLocaleDateString() 
-            }))
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 5);
         }
       }
+
+      // Fetch global highscores from Supabase public.highscores
+      const { data, error } = await supabase
+        .from('highscores')
+        .select('username, score, wave, created_at')
+        .order('score', { ascending: false })
+        .limit(5);
+
+      if (error) {
+        console.error('Supabase error loading scores:', error.message);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        sortedScores = data.map(item => ({
+          name: item.username,
+          score: item.score,
+          wave: item.wave,
+          date: new Date(item.created_at).toLocaleDateString()
+        }));
+      }
     } catch (e) {
-      console.error('Error loading highscores', e);
+      console.error('Error loading global highscores', e);
     }
   };
 

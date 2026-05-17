@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { onMount, onDestroy } from 'svelte';
+  import { supabase } from '$lib/supabase';
 
   // Game state type definitions
   type GameState = 'countdown' | 'playing' | 'wave_transition' | 'gameover';
@@ -421,8 +422,9 @@
     saveHighScore();
   };
 
-  const saveHighScore = () => {
+  const saveHighScore = async () => {
     try {
+      // 1. First save score locally in localStorage
       const stored = localStorage.getItem('balloonHighscores');
       let scoresList: Array<{ name: string; score: number; wave: number; date: string }> = [];
 
@@ -441,11 +443,7 @@
         }
       }
 
-      // Determine if it is a personal/global high score
-      const maxStored = scoresList.length > 0 ? Math.max(...scoresList.map(s => s.score)) : 0;
-      isNewHighScore = score > maxStored && score > 0;
-
-      // Add the new record
+      // Add the new record locally
       const newRecord = {
         name: username,
         score: score,
@@ -454,14 +452,59 @@
       };
 
       scoresList.push(newRecord);
-      // Sort descending and clamp to top 10
       scoresList.sort((a, b) => b.score - a.score);
       scoresList = scoresList.slice(0, 10);
-
       localStorage.setItem('balloonHighscores', JSON.stringify(scoresList));
-      leaderboard = scoresList.slice(0, 5); // display top 5
+
+      // 2. Insert record into Supabase public.highscores table
+      if (score > 0) {
+        const { error: insertError } = await supabase
+          .from('highscores')
+          .insert({
+            username: username,
+            score: score,
+            wave: wave
+          });
+
+        if (insertError) {
+          console.error('Supabase error inserting score:', insertError.message);
+        }
+      }
+
+      // 3. Fetch top global scores from Supabase
+      const { data: dbScores, error: fetchError } = await supabase
+        .from('highscores')
+        .select('username, score, wave, created_at')
+        .order('score', { ascending: false })
+        .limit(5);
+
+      if (fetchError) {
+        console.error('Supabase error fetching highscores:', fetchError.message);
+        // Fallback to local leaderboard if query fails
+        leaderboard = scoresList.slice(0, 5);
+      } else if (dbScores && dbScores.length > 0) {
+        // Map db records to scoreboard items
+        leaderboard = dbScores.map(item => ({
+          name: item.username,
+          score: item.score,
+          wave: item.wave,
+          date: new Date(item.created_at).toLocaleDateString()
+        }));
+
+        // Check if the current user's score achieved a top global highscore
+        const maxGlobalScore = Math.max(...dbScores.map(s => s.score), 0);
+        isNewHighScore = score >= maxGlobalScore && score > 0;
+      } else {
+        // Fallback to local
+        leaderboard = scoresList.slice(0, 5);
+        const maxLocal = scoresList.length > 1 ? Math.max(...scoresList.slice(1).map(s => s.score), 0) : 0;
+        isNewHighScore = score > maxLocal && score > 0;
+      }
     } catch (e) {
       console.error('Error saving highscore:', e);
+      // Fallback
+      leaderboard = scoresList.slice(0, 5);
+      isNewHighScore = score > 0;
     }
   };
 
