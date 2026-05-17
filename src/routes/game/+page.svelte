@@ -198,7 +198,7 @@
   };
 
   // Hintergrundmusik-Referenz
-  let bgMusic: HTMLAudioElement | null = null;
+  let bgMusic = $state<HTMLAudioElement | null>(null);
 
   // Reactively synchronize mute state and playback rate (speeding up 15% per wave!) to native HTMLAudioElement
   $effect(() => {
@@ -206,6 +206,11 @@
       bgMusic.muted = isMuted;
       // Normal speed on Wave 1, increases by 15% per wave, capped at 75% faster (1.75x speed)
       bgMusic.playbackRate = Math.min(1.75, 1.0 + (wave - 1) * 0.15);
+      
+      // If we are unmuting and the music is paused during gameplay, start playing it
+      if (!isMuted && gameState === 'playing' && bgMusic.paused) {
+        bgMusic.play().catch(e => console.warn('Audio play failed on unmute:', e));
+      }
     }
   });
 
@@ -748,6 +753,15 @@
   const toggleSound = () => {
     isMuted = !isMuted;
     localStorage.setItem('balloonAudioEnabled', String(!isMuted));
+    
+    if (bgMusic) {
+      bgMusic.muted = isMuted;
+      // If we just unmuted, and the game is playing, make sure music starts playing immediately!
+      if (!isMuted && gameState === 'playing' && bgMusic.paused) {
+        bgMusic.play().catch(e => console.warn('Audio play failed on unmute:', e));
+      }
+    }
+    
     playSound('beep');
   };
 </script>
