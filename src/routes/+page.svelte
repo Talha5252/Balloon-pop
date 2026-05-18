@@ -264,7 +264,7 @@
           <input 
             type="text" 
             id="username"
-            placeholder="BinLaden123..." 
+            placeholder="Player1..." 
             bind:value={username}
             onfocus={() => { inputFocused = true; playMenuMusic(); }}
             onblur={() => inputFocused = false}
